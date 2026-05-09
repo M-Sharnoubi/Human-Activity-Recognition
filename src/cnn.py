@@ -1,8 +1,5 @@
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, BatchNormalization, Activation, Dropout
-from tensorflow.keras.optimizers import Adam
-from sklearn.model_selection import train_test_split
-import numpy as np
 
 def build_cnn(input_shape=(128, 9), num_classes=6):
   model = Sequential([
