@@ -1,0 +1,6 @@
+# Raw data
+data/UCI_HAR_Dataset.zip
+data/UCI HAR Dataset/
+
+# macOS specific files
+**/__MACOSX/
