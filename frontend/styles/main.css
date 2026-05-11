@@ -1,0 +1,71 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700');
+:root {
+  --bs-body-bg:          #0d150e;
+  --bs-body-color:       #dbe5d9;
+  --bs-body-font-family: Inter, sans-serif;
+  --bs-border-color:     #3b4a3d;
+  --bs-border-radius:    4px;
+  --bs-border-radius-sm: 4px;
+  --bs-primary:          #00e676;
+  --bs-primary-rgb:      0, 230, 118;
+  --bs-link-color:       #b0c6ff;
+
+  --surface:      #19221a;
+  --surface-low:  #151e16;
+  --surface-high: #232c24;
+  --text-muted:   #bacbb9;
+  --accent-blue:  #b0c6ff;
+}
+
+.navbar { 
+  background-color: var(--bs-body-bg); 
+}
+
+.card { 
+  background-color: var(--surface); 
+  color: var(--bs-body-color); 
+}
+
+.progress { 
+  --bs-progress-bg: var(--surface-high); 
+  --bs-progress-bar-bg: linear-gradient(90deg, var(--accent-blue), var(--bs-primary)); 
+}
+
+.btn-primary { 
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary); 
+  color: #003918;
+}
+
+.btn-primary:hover { 
+  background-color: #62ff96; 
+  border-color: #62ff96; 
+  color: #003918; 
+}
+
+.btn-outline-primary { 
+  color: var(--text-muted); 
+  border-color: var(--bs-border-color); 
+}
+
+.btn-outline-primary:hover { 
+  color: var(--bs-primary); 
+  border-color: var(--bs-primary); 
+  background-color: var(--surface-high); 
+}
+
+.btn-outline-primary:pressed, .btn-outline-primary:pressed { 
+  color: var(--bs-primary); 
+  border-color: var(--bs-primary); 
+  background-color: var(--surface-high); 
+}
+
+.btn-outline-primary:disabled { 
+  color: var(--text-muted); 
+  border-color: var(--bs-border-color); 
+  background-color: transparent; 
+} */
+
+body {
+  overflow-x: hidden;
+}
