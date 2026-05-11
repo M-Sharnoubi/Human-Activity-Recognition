@@ -17,10 +17,10 @@
         <!-- Tabs -->
         <ul class="nav nav-underline">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Live Sensor Prediction</a>
+            <button class="nav-link active" onclick="displayPredictionTab()" id="live-prediction-tab">Live Sensor Prediction</button>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">CSV Upload</a>
+            <button class="nav-link" onclick="displayCSVTab()" id="csv-upload-tab">CSV Upload</button>
           </li>
         </ul>
 
@@ -45,7 +45,7 @@
   <!--  -->
 
   <main>
-    <section class="row gx-5 px-5 py-2">
+    <section class="row gx-5 px-5 py-2" id="live-sensor-prediction">
       <!-- Sensor buttons (start & stop) -->
       <div class="col-lg-12">
         <div class="card mb-3">
@@ -181,8 +181,41 @@
     <!--  -->
     </section>
 
-    <section class="upload-csv">
+    <section id="csv-upload" style="display: none;">
+      <div class="container mt-4">
+        <!-- CSV upload section -->
+        <div role="button" class="border border-2 rounded-3 p-5 text-center" id="upload-box" >
+          <input type="file" id="fileInput" class="d-none">
+          <span class="text-muted"><i class="fa-solid fa-file-csv fa-2x"></i></span>
+          <div class="text-muted mt-2">
+            <div>Drag and drop you CSV file here or click to browse</div>
+          </div>
+        </div>
+        <!--  -->
+        <p id="fileName" class="mt-3 text-success"></p>
+
+        <!-- Results -->
+        <div class="card">
+          <h5 class="card-header">Predictions</h5>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover table-sm">
+                <thead class="table-dark">
+                  <tr>
+                    <th scope="col" class="text-uppercase">Window #</th>
+                    <th scope="col" class="text-uppercase">Time Range</th>
+                    <th scope="col" class="text-uppercase">Predicted Activity</th>
+                    <th scope="col" class="text-uppercase">Confidence</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
+
+  <script src="scripts/app.js"></script>
 </body>
 </html>
