@@ -18,10 +18,10 @@
         <!-- Tabs -->
         <ul class="nav nav-underline">
           <li class="nav-item">
-            <button class="nav-link active" onclick="displayPredictionTab()" id="live-prediction-tab">Live Sensor Prediction</button>
+            <button class="nav-link active" onclick="displayCSVTab()" id="csv-upload-tab">CSV Upload</button>
           </li>
           <li class="nav-item">
-            <button class="nav-link" onclick="displayCSVTab()" id="csv-upload-tab">CSV Upload</button>
+            <button class="nav-link" onclick="displayPredictionTab()" id="live-prediction-tab">Live Sensor Prediction</button>
           </li>
         </ul>
 
@@ -46,7 +46,7 @@
   <!--  -->
 
   <main>
-    <section class="row gx-5 px-5 py-2" id="live-sensor-prediction">
+    <section class="row gx-5 px-5 py-2" id="live-sensor-prediction" style="display: none;">
       <!-- Sensor buttons (start & stop) -->
       <div class="col-lg-12">
         <div class="card mb-3">
@@ -209,7 +209,7 @@
     <!--  -->
     </section>
 
-    <section id="csv-upload" style="display: none;">
+    <section id="csv-upload">
       <div class="container mt-4">
         <!-- Upload box -->
         <div role="button" class="border border-2 rounded-3 p-5 text-center" id="upload-box">
