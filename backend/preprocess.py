@@ -32,9 +32,9 @@ def preprocess_data(df: pd.DataFrame):
         windows.append(sensor_data_scaled[start:end])
         
         time_metadata.append({
-            'window': len(windows),
-            't_start_ms': timestamps[start],
-            't_end_ms': timestamps[end - 1],
+            'window':     int(len(windows)),
+            't_start_ms': float(timestamps[start]),
+            't_end_ms':   float(timestamps[end - 1]),
         })
 
     return np.array(windows), time_metadata

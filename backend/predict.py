@@ -39,12 +39,12 @@ def predict(df, model_name):
     for i, pred in enumerate(predictions):
         predicted_label = classes[np.argmax(pred)]
         results.append({
-            'window': time[i]['window'],
-            'start': time[i]['t_start_ms'],
-            'end':   time[i]['t_end_ms'],
+            'window':             int(time[i]['window']),
+            'start':              float(time[i]['t_start_ms']),
+            'end':                float(time[i]['t_end_ms']),
             'predicted_activity': predicted_label,
-            'all_probabilities': {classes[j]: float(pred[j]) for j in range(len(classes))},
-            'confidence': float(np.max(pred)) * 100
+            'all_probabilities':  {classes[j]: float(pred[j]) for j in range(len(classes))},
+            'confidence':         float(np.max(pred)) * 100
         })
 
     return results
