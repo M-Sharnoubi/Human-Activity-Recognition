@@ -4,3 +4,6 @@ data/UCI HAR Dataset/
 
 # macOS specific files
 **/__MACOSX/
+
+.pyc
+__pycache__/
