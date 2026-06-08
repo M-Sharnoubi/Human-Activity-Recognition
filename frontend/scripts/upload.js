@@ -9,6 +9,9 @@ const resultsBody = document.getElementById('results-body');
 const errorMsg    = document.getElementById('upload-error');
 const loadingSpinner = document.getElementById('upload-loading');
 
+let allPredictions = [];
+let currentPage = 1;
+
 // Click upload box --> trigger file input
 uploadBox.addEventListener('click', () => fileInput.click());
 
@@ -28,6 +31,9 @@ uploadBox.addEventListener('drop', e => {
   const file = e.dataTransfer.files[0];
   if (file) handleFile(file);
 });
+
+document.getElementById('prev-page').addEventListener('click', prevPage);
+document.getElementById('next-page').addEventListener('click', nextPage);
 
 // File input change
 fileInput.addEventListener('change', () => {
@@ -58,10 +64,7 @@ async function handleFile(file) {
   const url   = `${API_URL}?model=${model}`;
 
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      body: formData,
-    });
+    const response = await fetch(url, { method: 'POST', body: formData });
 
     if (!response.ok) {
       const err = await response.json();
@@ -70,25 +73,47 @@ async function handleFile(file) {
     }
 
     const data = await response.json();
-    renderResults(data.predictions);
+    
+    // Save to global variables so other functions can see them
+    allPredictions = data.predictions || []; 
+    currentPage = 1; 
+
+    // Render page 1
+    renderResults(allPredictions, currentPage);
 
   } catch (err) {
+    console.error("Frontend Execution Error Details:", err);
     showError('Could not reach the server. Make sure the backend is running.');
   } finally {
     showLoading(false);
   }
 }
 
-// Render results table
-function renderResults(predictions) {
+// Render results (in a page of 10)
+function renderResults(predictions, page) {
   if (!predictions || predictions.length === 0) {
     showError('No predictions returned. CSV may be too short (needs at least 128 rows).');
     return;
   }
+  num_pages = Math.ceil(predictions.length / 10);
+
+  // Higlight active page button
+  const pageButtons = document.querySelectorAll('.page-item');
+  for (let i = 0; i < pageButtons.length; i++) {
+    pageButtons[i].classList.toggle('active', i === page);
+  }
+
+  // Disable/enable prev/next buttons
+  document.getElementById('prev-page').classList.toggle('disabled', page === 1);
+  document.getElementById('next-page').classList.toggle('disabled', page === num_pages);
 
   resultsBody.innerHTML = '';
 
-  predictions.forEach(p => {
+  start = (page - 1) * 10;
+  end = start + 10;
+  currentPagePredictions = predictions.slice(start, end);
+
+  for (const p of currentPagePredictions) {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${p.window}</td>
@@ -97,9 +122,19 @@ function renderResults(predictions) {
       <td>${p.confidence.toFixed(1)}%</td>
     `;
     resultsBody.appendChild(row);
-  });
+  }
 
   resultsCard.style.display = 'block';
+}
+
+function nextPage() {
+  currentPage++;
+  renderResults(allPredictions, currentPage);
+}
+
+function prevPage() {
+  currentPage--;
+  renderResults(allPredictions, currentPage);
 }
 
 // Helpers
