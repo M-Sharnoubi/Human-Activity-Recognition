@@ -15,9 +15,7 @@ classes = [
 
 models = {
     'cnn': 'cnn.h5',
-    'lstm': 'lstm.h5',
-    'gru': 'gru.h5',
-    'rnn': 'rnn.h5'
+    'lstm': 'lstm.h5'
 }
 
 MODEL_DIR = Path(__file__).parent.parent / 'models'
