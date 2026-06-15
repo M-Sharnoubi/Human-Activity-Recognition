@@ -143,7 +143,16 @@ function displayPageButtons() {
   });
   console.log("Page buttons to show:", pageButtonsToShow);
   
+  let lastPage = 0;
   for (let i of pageButtonsToShow) {
+    // Check if there is a jump in page numbers to display ellipsis
+    if (lastPage !== 0 && i - lastPage > 1) {
+      const ellipsis = document.createElement('li');
+      ellipsis.className = 'page-item disabled';
+      ellipsis.innerHTML = '<span class="page-link">...</span>';
+      pagination.insertBefore(ellipsis, nextButton);
+    }
+
     const pageButton = document.createElement('li');
     pageButton.className = `page-item ${i === currentPage ? 'active' : ''}`;
     pageButton.innerHTML = `<a class="page-link" href="#">${i}</a>`;
@@ -152,6 +161,7 @@ function displayPageButtons() {
       renderResults(allPredictions, currentPage);
     });
     pagination.insertBefore(pageButton, nextButton);
+    lastPage = i;
   }
 }
 
