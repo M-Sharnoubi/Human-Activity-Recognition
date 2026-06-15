@@ -9,6 +9,9 @@ const resultsBody = document.getElementById('results-body');
 const errorMsg    = document.getElementById('upload-error');
 const loadingSpinner = document.getElementById('upload-loading');
 
+let allPredictions = [];
+let currentPage = 1;
+
 // Click upload box --> trigger file input
 uploadBox.addEventListener('click', () => fileInput.click());
 
@@ -28,6 +31,9 @@ uploadBox.addEventListener('drop', e => {
   const file = e.dataTransfer.files[0];
   if (file) handleFile(file);
 });
+
+document.getElementById('prev-page').addEventListener('click', prevPage);
+document.getElementById('next-page').addEventListener('click', nextPage);
 
 // File input change
 fileInput.addEventListener('change', () => {
@@ -58,10 +64,7 @@ async function handleFile(file) {
   const url   = `${API_URL}?model=${model}`;
 
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      body: formData,
-    });
+    const response = await fetch(url, { method: 'POST', body: formData });
 
     if (!response.ok) {
       const err = await response.json();
@@ -70,25 +73,41 @@ async function handleFile(file) {
     }
 
     const data = await response.json();
-    renderResults(data.predictions);
+    
+    // Save to global variables so other functions can see them
+    allPredictions = data.predictions || []; 
+    currentPage = 1; 
+
+    // Render page 1
+    renderResults(allPredictions, currentPage);
 
   } catch (err) {
+    console.error("Frontend Execution Error Details:", err);
     showError('Could not reach the server. Make sure the backend is running.');
   } finally {
     showLoading(false);
   }
 }
 
-// Render results table
-function renderResults(predictions) {
+// Render results (in a page of 10)
+function renderResults(predictions, page) {
   if (!predictions || predictions.length === 0) {
     showError('No predictions returned. CSV may be too short (needs at least 128 rows).');
     return;
   }
+  const numPages = Math.ceil(predictions.length / 10);
+
+  // Disable/enable prev/next buttons
+  document.getElementById('prev-page').classList.toggle('disabled', page === 1);
+  document.getElementById('next-page').classList.toggle('disabled', page === numPages);
 
   resultsBody.innerHTML = '';
 
-  predictions.forEach(p => {
+  const start = (page - 1) * 10;
+  const end = start + 10;
+  const currentPagePredictions = predictions.slice(start, end);
+
+  for (const p of currentPagePredictions) {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${p.window}</td>
@@ -97,9 +116,69 @@ function renderResults(predictions) {
       <td>${p.confidence.toFixed(1)}%</td>
     `;
     resultsBody.appendChild(row);
-  });
+  }
 
   resultsCard.style.display = 'block';
+  displayPageButtons();
+}
+
+function displayPageButtons() {
+  // Display page buttons between previous and next buttons
+  const pagination = document.querySelector('.pagination');
+  const prevButton = document.getElementById('prev-page');
+  const nextButton = document.getElementById('next-page');
+  
+  // Clear existing page buttons
+  const existingPageButtons = pagination.querySelectorAll('.page-item:not(#prev-page):not(#next-page)');
+  existingPageButtons.forEach(btn => btn.remove());
+
+  // Display first and last page buttons, then 2 before and 2 after current page
+  const numPages = Math.ceil(allPredictions.length / 10);
+  const pageButtonsToShow = new Set([1, currentPage - 2, currentPage - 1, 
+                                currentPage, currentPage + 1, currentPage + 2, numPages]);
+  pageButtonsToShow.forEach(i => {
+    if (i < 1 || i > numPages) {
+      pageButtonsToShow.delete(i);
+    }
+  });
+  console.log("Page buttons to show:", pageButtonsToShow);
+  
+  let lastPage = 0;
+  for (let i of pageButtonsToShow) {
+    // Check if there is a jump in page numbers to display ellipsis
+    if (lastPage !== 0 && i - lastPage > 1) {
+      const ellipsis = document.createElement('li');
+      ellipsis.className = 'page-item disabled';
+      ellipsis.innerHTML = '<span class="page-link">...</span>';
+      pagination.insertBefore(ellipsis, nextButton);
+    }
+
+    const pageButton = document.createElement('li');
+    pageButton.className = `page-item ${i === currentPage ? 'active' : ''}`;
+    pageButton.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+    pageButton.addEventListener('click', () => {
+      currentPage = i;
+      renderResults(allPredictions, currentPage);
+    });
+    pagination.insertBefore(pageButton, nextButton);
+    lastPage = i;
+  }
+}
+
+function nextPage() {
+  if (currentPage * 10 >= allPredictions.length) {
+    return;
+  }
+  currentPage++;
+  renderResults(allPredictions, currentPage);
+}
+
+function prevPage() {
+  if (currentPage === 1) {
+    return;
+  }
+  currentPage--;
+  renderResults(allPredictions, currentPage);
 }
 
 // Helpers
