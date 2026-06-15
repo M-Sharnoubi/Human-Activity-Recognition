@@ -128,11 +128,17 @@ function renderResults(predictions, page) {
 }
 
 function nextPage() {
+  if (currentPage * 10 >= allPredictions.length) {
+    return;
+  }
   currentPage++;
   renderResults(allPredictions, currentPage);
 }
 
 function prevPage() {
+  if (currentPage === 1) {
+    return;
+  }
   currentPage--;
   renderResults(allPredictions, currentPage);
 }
