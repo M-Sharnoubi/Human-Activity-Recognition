@@ -95,23 +95,17 @@ function renderResults(predictions, page) {
     showError('No predictions returned. CSV may be too short (needs at least 128 rows).');
     return;
   }
-  num_pages = Math.ceil(predictions.length / 10);
-
-  // Higlight active page button
-  const pageButtons = document.querySelectorAll('.page-item');
-  for (let i = 0; i < pageButtons.length; i++) {
-    pageButtons[i].classList.toggle('active', i === page);
-  }
+  const numPages = Math.ceil(predictions.length / 10);
 
   // Disable/enable prev/next buttons
   document.getElementById('prev-page').classList.toggle('disabled', page === 1);
-  document.getElementById('next-page').classList.toggle('disabled', page === num_pages);
+  document.getElementById('next-page').classList.toggle('disabled', page === numPages);
 
   resultsBody.innerHTML = '';
 
-  start = (page - 1) * 10;
-  end = start + 10;
-  currentPagePredictions = predictions.slice(start, end);
+  const start = (page - 1) * 10;
+  const end = start + 10;
+  const currentPagePredictions = predictions.slice(start, end);
 
   for (const p of currentPagePredictions) {
     const row = document.createElement('tr');
@@ -125,6 +119,40 @@ function renderResults(predictions, page) {
   }
 
   resultsCard.style.display = 'block';
+  displayPageButtons();
+}
+
+function displayPageButtons() {
+  // Display page buttons between previous and next buttons
+  const pagination = document.querySelector('.pagination');
+  const prevButton = document.getElementById('prev-page');
+  const nextButton = document.getElementById('next-page');
+  
+  // Clear existing page buttons
+  const existingPageButtons = pagination.querySelectorAll('.page-item:not(#prev-page):not(#next-page)');
+  existingPageButtons.forEach(btn => btn.remove());
+
+  // Display first and last page buttons, then 2 before and 2 after current page
+  const numPages = Math.ceil(allPredictions.length / 10);
+  const pageButtonsToShow = new Set([1, currentPage - 2, currentPage - 1, 
+                                currentPage, currentPage + 1, currentPage + 2, numPages]);
+  pageButtonsToShow.forEach(i => {
+    if (i < 1 || i > numPages) {
+      pageButtonsToShow.delete(i);
+    }
+  });
+  console.log("Page buttons to show:", pageButtonsToShow);
+  
+  for (let i of pageButtonsToShow) {
+    const pageButton = document.createElement('li');
+    pageButton.className = `page-item ${i === currentPage ? 'active' : ''}`;
+    pageButton.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+    pageButton.addEventListener('click', () => {
+      currentPage = i;
+      renderResults(allPredictions, currentPage);
+    });
+    pagination.insertBefore(pageButton, nextButton);
+  }
 }
 
 function nextPage() {
