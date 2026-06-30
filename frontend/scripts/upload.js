@@ -1,14 +1,16 @@
 const API_URL = 'https://8000-01kr0y1n182efpkptj5kbabp8j.cloudspaces.litng.ai/api/predict';
 
 // DOM elements
-const uploadBox   = document.getElementById('upload-box');
-const fileInput   = document.getElementById('fileInput');
-const fileName    = document.getElementById('fileName');
+const uploadBox = document.getElementById('upload-box');
+const fileInput = document.getElementById('fileInput');
+const fileName = document.getElementById('fileName');
 const resultsCard = document.getElementById('results-card');
 const resultsBody = document.getElementById('results-body');
-const errorMsg    = document.getElementById('upload-error');
+const errorMsg = document.getElementById('upload-error');
 const loadingSpinner = document.getElementById('upload-loading');
+const deleteFileButton = document.getElementById('delete-file-btn');
 
+let inferenceController = null; // Holds the AbortController instance
 let allPredictions = [];
 let currentPage = 1;
 
@@ -41,6 +43,29 @@ fileInput.addEventListener('change', () => {
   if (file) handleFile(file);
 });
 
+deleteFileButton.addEventListener('click', () => {
+  // If inference is running, cancel the HTTP request immediately
+  if (inferenceController) {
+    inferenceController.abort();
+    inferenceController = null;
+  }
+
+  // Wipe data states completely
+  fileInput.value = '';
+  allPredictions = [];
+  currentPage = 1;
+
+  // Clear and reset layout elements
+  fileName.textContent = '';
+  resultsBody.innerHTML = '';
+  
+  // Hide results and delete button, stop loading spinner, hide error message
+  resultsCard.style.display = 'none';
+  deleteFileButton.style.display = 'none';
+  showLoading(false);
+  hideError();
+});
+
 // Main handler
 async function handleFile(file) {
   // Validate CSV
@@ -50,7 +75,8 @@ async function handleFile(file) {
   }
 
   // Update UI
-  fileName.textContent  = file.name;
+  fileName.textContent = file.name;
+  deleteFileButton.style.display = 'inline-block'; // Instantly show clear button
   hideError();
   showLoading(true);
   resultsCard.style.display = 'none';
@@ -63,8 +89,12 @@ async function handleFile(file) {
   const model = (window.getModel ? window.getModel() : 'lstm').toLowerCase();
   const url   = `${API_URL}?model=${model}`;
 
+  // Create a new AbortController instance for this specific request
+  inferenceController = new AbortController();
+  const { signal } = inferenceController;
+
   try {
-    const response = await fetch(url, { method: 'POST', body: formData });
+    const response = await fetch(url, { method: 'POST', body: formData, signal: signal });
 
     if (!response.ok) {
       const err = await response.json();
@@ -82,10 +112,17 @@ async function handleFile(file) {
     renderResults(allPredictions, currentPage);
 
   } catch (err) {
+    // If the error is an AbortError, it means the fetch was canceled, so we can ignore it
+    if (err.name === 'AbortError') {
+      return;
+    }
+
     console.error("Frontend Execution Error Details:", err);
     showError('Could not reach the server. Make sure the backend is running.');
   } finally {
-    showLoading(false);
+    if (!signal.aborted) {
+      showLoading(false);
+    }
   }
 }
 
@@ -163,6 +200,22 @@ function displayPageButtons() {
     pagination.insertBefore(pageButton, nextButton);
     lastPage = i;
   }
+}
+
+function deleteFile() {
+  // 1. Reset file inputs and data arrays
+  fileInput.value = '';
+  allPredictions = [];
+  currentPage = 1;
+
+  // 2. Clear UI texts
+  fileName.textContent = '';
+  resultsBody.innerHTML = '';
+
+  // 3. Toggle visibilities
+  resultsCard.style.display = 'none';
+  deleteFileButton.style.display = 'none';
+  hideError();
 }
 
 function nextPage() {
