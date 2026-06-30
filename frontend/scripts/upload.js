@@ -1,14 +1,14 @@
 const API_URL = 'https://8000-01kr0y1n182efpkptj5kbabp8j.cloudspaces.litng.ai/api/predict';
 
 // DOM elements
-const uploadBox   = document.getElementById('upload-box');
-const fileInput   = document.getElementById('fileInput');
-const fileName    = document.getElementById('fileName');
+const uploadBox = document.getElementById('upload-box');
+const fileInput = document.getElementById('fileInput');
+const fileName = document.getElementById('fileName');
 const resultsCard = document.getElementById('results-card');
 const resultsBody = document.getElementById('results-body');
-const errorMsg    = document.getElementById('upload-error');
+const errorMsg = document.getElementById('upload-error');
 const loadingSpinner = document.getElementById('upload-loading');
-const deleteFileBtn = document.getElementById('delete-file-btn');
+const deleteFileButton = document.getElementById('delete-file-btn');
 
 let inferenceController = null; // Holds the AbortController instance
 let allPredictions = [];
@@ -43,25 +43,25 @@ fileInput.addEventListener('change', () => {
   if (file) handleFile(file);
 });
 
-deleteFileBtn.addEventListener('click', () => {
-  // 1. If inference is running, cancel the HTTP request immediately
+deleteFileButton.addEventListener('click', () => {
+  // If inference is running, cancel the HTTP request immediately
   if (inferenceController) {
     inferenceController.abort();
     inferenceController = null;
   }
 
-  // 2. Wipe data states completely
+  // Wipe data states completely
   fileInput.value = '';
   allPredictions = [];
   currentPage = 1;
 
-  // 3. Clear and reset layout elements
+  // Clear and reset layout elements
   fileName.textContent = '';
   resultsBody.innerHTML = '';
   
-  // 4. Force structural visibility back to pristine state
+  // Hide results and delete button, stop loading spinner, hide error message
   resultsCard.style.display = 'none';
-  deleteFileBtn.style.display = 'none';
+  deleteFileButton.style.display = 'none';
   showLoading(false);
   hideError();
 });
@@ -76,7 +76,7 @@ async function handleFile(file) {
 
   // Update UI
   fileName.textContent = file.name;
-  deleteFileBtn.style.display = 'inline-block'; // Instantly show clear button
+  deleteFileButton.style.display = 'inline-block'; // Instantly show clear button
   hideError();
   showLoading(true);
   resultsCard.style.display = 'none';
@@ -214,7 +214,7 @@ function deleteFile() {
 
   // 3. Toggle visibilities
   resultsCard.style.display = 'none';
-  deleteFileBtn.style.display = 'none';
+  deleteFileButton.style.display = 'none';
   hideError();
 }
 
